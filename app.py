@@ -109,11 +109,7 @@ init_session_state()
 
 # Sidebar: Global controls and graph status
 with st.sidebar:
-    st.image(
-        "https://raw.githubusercontent.com/networkx/networkx/main/doc/static/networkx_logo.svg",
-        width=140,
-    )
-    st.title("Mini AI Compiler")
+    st.markdown("## ⚡ Mini AI Compiler")
     st.caption("DAG Optimization & Execution Engine")
     st.markdown("---")
 
@@ -139,7 +135,7 @@ with st.sidebar:
         st.session_state["pipeline_result"] = pipeline.compile(g)
         st.session_state["last_exec_results"] = None
         st.session_state["benchmark_metrics"] = None
-        st.success(f"Loaded: {selected_preset}")
+        st.toast(f"Loaded: {selected_preset}", icon="✅")
         st.rerun()
 
     st.markdown("---")
@@ -163,6 +159,13 @@ st.markdown(
     'Shape Inference, Dead Code Elimination, Constant Folding, CSE, Algebraic Simplification, '
     'and Operator Fusion with NumPy execution.</div>',
     unsafe_allow_html=True,
+)
+
+curr_g = st.session_state["current_graph"]
+st.info(
+    f"📍 **Currently Loaded Graph:** `{curr_g.name}` ({len(curr_g.nodes)} nodes, {len(curr_g.outputs)} outputs) — "
+    f"*{st.session_state.get('graph_description', '')}*\n\n"
+    f"👉 **Click on Tab 2 (Graph Builder), Tab 3 (Optimization Passes), or view the live DAG preview below!**"
 )
 
 # 7 Main Tabs as specified in requirements
@@ -228,6 +231,12 @@ with tabs[0]:
             - **Pure Python & NumPy Core:** Runs with zero compulsory deep learning dependencies.
             """
         )
+
+    st.markdown("---")
+    st.markdown(f"### 🌐 Live Graph Visualization: **`{curr_g.name}`** ({len(curr_g.nodes)} nodes)")
+    st.caption(f"Visualizing current graph structure. Switch to **Tab 2 (Graph Builder)** to edit, or **Tab 3 (Optimization Passes)** to optimize.")
+    fig_overview = create_plotly_graph_figure(curr_g, title=f"DAG: {curr_g.name}")
+    st.plotly_chart(fig_overview, use_container_width=True)
 
 # ==============================================================================
 # TAB 2: GRAPH BUILDER
